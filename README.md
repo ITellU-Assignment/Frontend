@@ -28,7 +28,7 @@ Admin panel to view, filter, search, and paginate lesson invites.
 ````
 
 2. **Environment variables**
-   Create a file `.env.local` in the `frontend/` folder with the following content:
+   Create a file `.env` in the `frontend/` folder with the following content:
 
    ```env
    # API base URL
@@ -36,9 +36,9 @@ Admin panel to view, filter, search, and paginate lesson invites.
 
    # Admin credentials for NextAuth
    ADMIN_USER=admin
-   ADMIN_PASS=supersecret
+   ADMIN_PASS=admin123
 
-   # NextAuth secret (use a long random string in production)
+   # NextAuth secret (use a long random string in production
    NEXTAUTH_SECRET=your_nextauth_secret_here
    ```
 
@@ -79,9 +79,7 @@ frontend/
 │   ├── layout.tsx
 │   └── page.tsx
 ├── public/
-├── styles/
-│   └── globals.css
-├── .env.local
+├── .env
 ├── next.config.js
 ├── package.json
 └── tsconfig.json
