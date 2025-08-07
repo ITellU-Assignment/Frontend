@@ -1,0 +1,124 @@
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.signout {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #666;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn:hover { background: #f2f2f2; }
+.active { background: #0070f3; color: white; border-color: #0070f3; }
+.search {
+  margin-left: auto;
+  padding: 0.5rem;
+  border: 1px solid #666;
+  border-radius: 4px;
+}
+.message {
+  text-align: center;
+  margin-top: 2rem;
+}
+.error { color: #aa0000; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+.table th,
+.table td {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+.pending { color: #d18400; }
+.accepted { color: #007700; }
+.rejected { color: #aa0000; }
+
+/* Pagination controls */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.pagination button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #666;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Responsive table for narrow screens */
+@media (max-width: 600px) {
+  .table, .table thead, .table tbody, 
+  .table th, .table td, .table tr {
+    display: block;
+  }
+  .table thead {
+    display: none;
+  }
+  .table tr {
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    border-radius: 4px;
+  }
+  .table td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border: none;
+    border-bottom: 1px solid #eee;
+    position: relative;
+  }
+  .table td:last-child {
+    border-bottom: none;
+  }
+  .table td::before {
+    content: attr(data-label);
+    font-weight: bold;
+  }
+}
+
+.signout {
+  background: transparent;
+  border: 1px solid #f00;
+  color: #f00;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.signout:hover {
+  background: #f00;
+  color: white;
+}
