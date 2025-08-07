@@ -1,19 +1,21 @@
 'use client';
+
 import { useState, useEffect, useMemo } from 'react';
-import { signOut, useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import {sanitize} from '@/utils/sanitize';
+import { Invite } from '@/types/invite';
+
 import FilterControls from './components/FilterControls';
 import SearchBox from './components/SearchBox';
 import InviteTable from './components/InviteTable';
 import Pagination from './components/Pagination';
-import styles from './invites.module.css';
-import { sanitize } from '@/utils/sanitize';
-import { Invite } from '@/types/invite';
 
+import styles from './invites.module.css';
+import useDebounce from '../hooks/useDebounce';
 const STATUS_OPTIONS = ['all', 'pending', 'accepted', 'rejected'] as const;
 const API = process.env.NEXT_PUBLIC_API_URL!;
 const PAGE_SIZE = 10;
-
 
 export default function InvitesPage() {
   const router = useRouter();
@@ -22,11 +24,13 @@ export default function InvitesPage() {
   const [invites, setInvites] = useState<Invite[]>([]);
   const [filter, setFilter] = useState<typeof STATUS_OPTIONS[number]>('all');
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300);
+
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Date formatter
+  // Formatter for dates
   const dateFmt = useMemo(
     () =>
       new Intl.DateTimeFormat(undefined, {
@@ -36,29 +40,37 @@ export default function InvitesPage() {
     []
   );
 
-  // Redirect if not authenticated
+  // Redirect unauthenticated users back to home
   useEffect(() => {
-    if (status === 'unauthenticated') router.replace('/');
+    if (status === 'unauthenticated') {
+      router.replace('/');
+    }
   }, [status, router]);
 
-  // Fetch invites once authenticated
+  // Fetch invites once we're authenticated
   useEffect(() => {
-    if (status !== 'authenticated') return;
+    if (status !== 'authenticated') {
+      setInvites([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
+
     fetch(`${API}/invites${filter !== 'all' ? `?status=${filter}` : ''}`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
+        return res.json() as Promise<Invite[]>;
       })
       .then(setInvites)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [status, filter]);
 
-  // Filter + sanitize search
+  // Apply search & filter
   const filtered = useMemo(() => {
-    const q = sanitize(search).toLowerCase();
+    const q = sanitize(debouncedSearch).toLowerCase();
     return invites.filter((inv) => {
       if (filter !== 'all' && inv.status !== filter) return false;
       return (
@@ -66,23 +78,37 @@ export default function InvitesPage() {
         inv.student.name.toLowerCase().includes(q)
       );
     });
-  }, [invites, filter, search]);
+  }, [invites, filter, debouncedSearch]);
 
-  // Pagination
+  // Pagination logic
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const pageData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pageData = filtered.slice(
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE
+  );
 
+  // While loading auth state
+  if (status === 'loading') {
+    return (
+      <main className={styles.container}>
+        <p className={styles.message}>Loading session…</p>
+      </main>
+    );
+  }
+
+  // Main render
   return (
     <main className={styles.container}>
-<header className={styles.header}>
-  <h2 className={styles.title}>Lesson Invites</h2>
-  <button
-    className={styles.signout}
-    onClick={() => signOut({ callbackUrl: '/' })}
-  >
-    Sign Out
-  </button>
-</header>
+      <header className={styles.header}>
+        <h2 className={styles.title}>Lesson Invites</h2>
+        <button
+          className={styles.signout}
+          onClick={() => signOut({ callbackUrl: '/' })}
+        >
+          Sign Out
+        </button>
+      </header>
+
       <FilterControls
         options={STATUS_OPTIONS}
         value={filter}
